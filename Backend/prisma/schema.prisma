@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  user_id   Int      @id @default(autoincrement())
+  username  String?
+  email     String   @unique
+  password  String
+  roleId    Int?
+  role      role?    @relation(fields: [roleId], references: [role_id])
+  createdAt DateTime @default(now())
+
+  profile        profile?
+  work_logs      work_log[]      @relation("userwork_logs")
+  projects       project[]       @relation("Createdprojects")
+  attendances    attendance[]
+  leave_requests leave_request[]
+  tasks          task[]          @relation("usertasks")
+  createdtasks   task[]          @relation("taskCreatedBy")
+  updatedtasks   task[]          @relation("taskUpdatedBy")
+}
+
+model role {
+  role_id   Int      @id @default(autoincrement())
+  role_name String   @unique
+  users     user[]
+  createdAt DateTime @default(now())
+  createdBy String
+  updateAt  DateTime
+  updateBy  String
+}
+
+model profile {
+  profile_id Int     @id @default(autoincrement())
+  fullName   String
+  avatar     String?
+  bio        String?
+
+  userId Int  @unique
+  user   user @relation(fields: [userId], references: [user_id])
+}
+
+model task {
+  task_id     Int      @id @default(autoincrement())
+  title       String
+  description String
+  status      String
+  assigneeId  Int
+  image       String
+  priority    String
+  datetime    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  createdBy   Int      
+  updateAt    DateTime @default(now()) @updatedAt 
+  updateBy    Int      
+  logs        Json?  
+
+  projectId Int?
+  project   project? @relation("projecttasks", fields: [projectId], references: [project_id])
+
+  assignee user @relation("usertasks", fields: [assigneeId], references: [user_id])
+  creator  user @relation("taskCreatedBy", fields: [createdBy], references: [user_id])
+  updater  user @relation("taskUpdatedBy", fields: [updateBy], references: [user_id])
+}
+
+model project {
+  project_id   Int      @id @default(autoincrement())
+  project_name String
+  createdAt    DateTime @default(now())
+  createdById  Int
+  updateAt     DateTime @default(now())
+  updateBy     String
+
+  createdBy user   @relation("Createdprojects", fields: [createdById], references: [user_id])
+  tasks     task[] @relation("projecttasks")
+}
+
+model work_log {
+  work_log_id Int      @id @default(autoincrement())
+  title       String
+  description String
+  startTime   String
+  endTime     String
+  status      String
+  date        DateTime @db.Date
+  comment     String
+  userId      Int
+
+  user user @relation("userwork_logs", fields: [userId], references: [user_id])
+}
+
+model attendance {
+  attendance_id Int       @id @default(autoincrement())
+  userId        Int
+  date          DateTime  @db.Date
+  checkIn       DateTime?
+  checkOut      DateTime?
+  status        String
+  note          String?
+  user          user      @relation(fields: [userId], references: [user_id])
+}
+
+model leave_request {
+  leave_id    Int      @id @default(autoincrement())
+  userId      Int
+  type        String
+  startDate   DateTime @db.Date
+  endDate     DateTime @db.Date
+  reason      String
+  status      String
+  submittedAt DateTime @default(now())
+
+  user user @relation(fields: [userId], references: [user_id])
+}
+

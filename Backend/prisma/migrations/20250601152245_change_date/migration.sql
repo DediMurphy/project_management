@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "attendance" ALTER COLUMN "checkIn" SET DATA TYPE DATE,
+ALTER COLUMN "checkOut" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "leave_request" ALTER COLUMN "startDate" SET DATA TYPE DATE,
+ALTER COLUMN "endDate" SET DATA TYPE DATE;
