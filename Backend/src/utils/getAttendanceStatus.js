@@ -1,6 +1,11 @@
+const DEFAULT_START_TIME = "09:00";
+const DEFAULT_END_TIME = "17:00";
+const LATE_TOLERANCE_MINUTES = 15;
+const HALF_DAY_LIMIT_HOUR = 12;
+
 export function isLatet(checkInTime) {
-  const [startHourLocal, startMinLocal] = process.env.DEFAULT_START_TIME.split(":").map(Number);
-  const tolerance = parseInt(process.env.LATE_TOLERANCE_MINUTES || "0");
+  const [startHourLocal, startMinLocal] = DEFAULT_START_TIME.split(":").map(Number);
+  const tolerance = LATE_TOLERANCE_MINUTES;
 
   const expectedStartHourUTC = startHourLocal - 7;
 
@@ -13,10 +18,6 @@ export function isLatet(checkInTime) {
 }
 
 export function getAttendanceStatus(checkIn, checkOut) {
-  const [startHour, startMin] = process.env.DEFAULT_START_TIME.split(":").map(Number);
-  const [endHour, endMin] = process.env.DEFAULT_END_TIME.split(":").map(Number);
-  const halfDayLimitHour = parseInt(process.env.HALF_DAY_LIMIT_HOUR || "12");
-
   if (!checkIn) {
     return "Tidak Ada Check-in";
   }
@@ -38,7 +39,7 @@ export function getAttendanceStatus(checkIn, checkOut) {
     status = "Full Day";
   } else if (workedHours >= halfDayThreshold) {
     status = "Half Day";
-  } else if (checkIn.getHours() >= halfDayLimitHour) {
+  } else if (checkIn.getHours() >= HALF_DAY_LIMIT_HOUR) {
     status = "Half Day";
   } else {
     status = "Half Day";
